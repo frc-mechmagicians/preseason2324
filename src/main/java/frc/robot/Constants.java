@@ -6,7 +6,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 
 
 ;
@@ -21,23 +22,23 @@ public final class Constants {
     public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
     /* Drivetrain Constants */
-    public static final double trackWidth = 0;
-    public static final double wheelBase = 0;
-    public static final double wheelDiameter = 0;
-    public static final double wheelCircumference = 0;
+    public static final double trackWidth = Units.inchesToMeters(21.73);
+    public static final double wheelBase = Units.inchesToMeters(21.73);
+    public static final double wheelDiameter = Units.inchesToMeters(4.0);
+    public static final double wheelCircumference = wheelDiameter * Math.PI;
 
-    public static final double openLoopRamp = 0;
-    public static final double closedLoopRamp = 0;
+    public static final double openLoopRamp = 0.25;
+    public static final double closedLoopRamp = 0.0;
 
-    public static final double driveGearRatio = 0;
-    public static final double angleGearRatio =0;
-
+    public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
+    public static final double angleGearRatio = (12.8 / 1.0); // 12.8:1
+    public static final double td = .5588/2;
     public static final SwerveDriveKinematics swerveKinematics =
         new SwerveDriveKinematics(
-            new Translation2d(0, 0),
-            new Translation2d(0, 0),
-            new Translation2d(0, 0),
-            new Translation2d(0, 0));
+            new Translation2d(td, td),
+            new Translation2d(td,-td),
+            new Translation2d(-td, td),
+            new Translation2d(-td, -td));
 
     /* Swerve Voltage Compensation */
     public static final double voltageComp = 0;
@@ -125,6 +126,20 @@ public final class Constants {
           new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
     }
   }
+  public static final class AutoConstants {
+    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
+    public static final double kPXController = 1;
+    public static final double kPYController = 1;
+    public static final double kPThetaController = 1;
 
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
 }
+
